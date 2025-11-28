@@ -1,0 +1,40 @@
+.benefits {
+  padding: 100px 20px;
+  text-align: center;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 900;
+  }
+}
+
+.desc {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+.grid {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin-top: 10px;
+    color: #64748b;
+  }
+}

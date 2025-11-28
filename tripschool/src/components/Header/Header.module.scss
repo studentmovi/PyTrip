@@ -1,0 +1,96 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(6px);
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s ease, border 0.3s ease;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LEFT SIDE (logo) */
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIcon {
+  width: 1.7rem;
+  height: 1.7rem;
+  color: var(--primary);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* NAVIGATION */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+
+  a {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--foreground);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  /* CTA BUTTON */
+  .cta {
+    background: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: white !important;
+    font-weight: 600;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+/* DARK MODE TOGGLE */
+
+.themeToggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--foreground);
+  font-size: 1rem;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--card);
+  }
+}

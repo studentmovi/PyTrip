@@ -1,0 +1,42 @@
+.footer {
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  transition: background 0.3s ease, border 0.3s ease;
+
+  p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin: 0;
+  }
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.icons {
+  display: flex;
+  gap: 1.25rem;
+
+  a {
+    display: inline-flex;
+    color: var(--muted-strong);
+    transition: color 0.25s ease;
+
+    &:hover {
+      color: var(--primary);
+    }
+
+    svg {
+      display: block;
+    }
+  }
+}

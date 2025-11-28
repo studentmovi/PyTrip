@@ -1,0 +1,118 @@
+/* Background overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+
+/* Modal */
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 480px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(var(--card-rgb), 0.25);
+
+  animation: popIn .25s ease forwards;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.h2 {
+  margin: 0 0 .5rem 0;
+  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  font-size: .9rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  label {
+    font-weight: 600;
+    color: var(--foreground);
+    display: flex;
+    flex-direction: column;
+
+    input,
+    textarea {
+      margin-top: .4rem;
+      padding: .7rem 1rem;
+      border-radius: 10px;
+      font-size: .95rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--foreground);
+
+      &:focus {
+        border-color: var(--primary);
+        outline: none;
+      }
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+  }
+}
+
+.submitBtn {
+  background: var(--primary);
+  color: white;
+  padding: .9rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: filter .2s;
+
+  &:hover {
+    filter: brightness(.92);
+  }
+}
+
+/* Close button */
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: var(--surface);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: filter .15s;
+
+  &:hover {
+    filter: brightness(.9);
+  }
+}
