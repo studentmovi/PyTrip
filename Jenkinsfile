@@ -59,43 +59,43 @@ pipeline {
 
     post {
         success {
-            sh """
-            curl -H 'Content-Type: application/json' \
-            -d '{
-              "username": "Jenkins",
-              "embeds": [{
-                "title": "✅ Build SUCCESS – PyTrip",
-                "color": 3066993,
-                "fields": [
-                  { "name": "Repository", "value": "studentmovi/PyTrip", "inline": true },
-                  { "name": "Branch", "value": "main", "inline": true },
-                  { "name": "Status", "value": "SUCCESS 🚀", "inline": false }
+            sh '''
+            curl -H "Content-Type: application/json" \
+            -d "{
+              \\"username\\": \\"Jenkins\\",
+              \\"embeds\\": [{
+                \\"title\\": \\"✅ Build SUCCESS – PyTrip\\",
+                \\"color\\": 3066993,
+                \\"fields\\": [
+                  { \\"name\\": \\"Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
+                  { \\"name\\": \\"Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                  { \\"name\\": \\"Status\\", \\"value\\": \\"SUCCESS 🚀\\", \\"inline\\": false }
                 ],
-                "footer": { "text": "Jenkins CI" },
-                "timestamp": "'$(date -Iseconds)'"
+                \\"footer\\": { \\"text\\": \\"Jenkins CI\\" },
+                \\"timestamp\\": \\"$(date -Iseconds)\\"
               }]
-            }' $DISCORD_WEBHOOK
-            """
+            }" "$DISCORD_WEBHOOK"
+            '''
         }
 
         failure {
-            sh """
-            curl -H 'Content-Type: application/json' \
-            -d '{
-              "username": "Jenkins",
-              "embeds": [{
-                "title": "❌ Build FAILED – PyTrip",
-                "color": 15158332,
-                "fields": [
-                  { "name": "Repository", "value": "studentmovi/PyTrip", "inline": true },
-                  { "name": "Branch", "value": "main", "inline": true },
-                  { "name": "Status", "value": "FAILURE 🚨", "inline": false }
+            sh '''
+            curl -H "Content-Type: application/json" \
+            -d "{
+              \\"username\\": \\"Jenkins\\",
+              \\"embeds\\": [{
+                \\"title\\": \\"❌ Build FAILED – PyTrip\\",
+                \\"color\\": 15158332,
+                \\"fields\\": [
+                  { \\"name\\": \\"Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
+                  { \\"name\\": \\"Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                  { \\"name\\": \\"Status\\", \\"value\\": \\"FAILURE 🚨\\", \\"inline\\": false }
                 ],
-                "footer": { "text": "Jenkins CI" },
-                "timestamp": "'$(date -Iseconds)'"
+                \\"footer\\": { \\"text\\": \\"Jenkins CI\\" },
+                \\"timestamp\\": \\"$(date -Iseconds)\\"
               }]
-            }' $DISCORD_WEBHOOK
-            """
+            }" "$DISCORD_WEBHOOK"
+            '''
         }
     }
 }
