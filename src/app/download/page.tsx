@@ -7,15 +7,24 @@ import styles from "./download.module.scss";
 type Release = {
     version: string;
     changes: string[];
+    assets: {
+        windows: string | null;
+        linux: string | null;
+        macos?: string | null;
+    };
 };
 
 export default function DownloadPage() {
     const [releases, setReleases] = useState<Release[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadData() {
             try {
-                const res = await fetch("/api/app/version", { cache: "no-store" });
+                const res = await fetch("/api/app/releases", {
+                    cache: "no-store",
+                });
+
                 if (!res.ok) throw new Error("API error");
 
                 const data = await res.json();
@@ -24,37 +33,72 @@ export default function DownloadPage() {
                 }
             } catch (err) {
                 console.error("Error loading download data", err);
+            } finally {
+                setLoading(false);
             }
         }
 
         loadData();
     }, []);
 
+    if (loading) {
+        return <main className={styles.download}>Loading…</main>;
+    }
+
     const latest = releases[0];
     const olderVersions = releases.slice(1);
+
+    const renderButton = (
+        label: string,
+        url: string | null,
+        primary = false
+    ) => {
+        if (url) {
+            return (
+                <a
+                    href={url}
+                    target="_blank"
+                    className={primary ? styles.btnPrimary : styles.btn}
+                >
+                    {label}
+                </a>
+            );
+        }
+
+        return (
+            <span className={styles.btnDisabled}>
+                {label}
+                <small>Coming soon</small>
+            </span>
+        );
+    };
 
     return (
         <main className={styles.download}>
             <h1>Download the latest version of PyTrip</h1>
 
-            {/* VERSION CARD */}
+            {/* LATEST VERSION */}
             {latest && (
                 <section className={styles.versionBox}>
                     <h2>
-                        Version {latest.version}{" "}
+                        Version {latest.version}
                         <span className={styles.tag}>Latest</span>
                     </h2>
 
                     <div className={styles.buttons}>
-                        <button className={styles.btnPrimary}>
-                            Download for Windows
-                        </button>
-                        <button className={styles.btn}>
-                            Download for macOS
-                        </button>
-                        <button className={styles.btn}>
-                            Download for Linux
-                        </button>
+                        {renderButton(
+                            "Download for Windows",
+                            latest.assets.windows,
+                            true
+                        )}
+                        {renderButton(
+                            "Download for Linux",
+                            latest.assets.linux
+                        )}
+                        {renderButton(
+                            "Download for macOS",
+                            latest.assets.macos ?? null
+                        )}
                     </div>
 
                     <Accordion title="What's new in this version?">
@@ -67,51 +111,50 @@ export default function DownloadPage() {
                 </section>
             )}
 
-            {/* INSTALL INSTRUCTIONS */}
+            {/* INSTALL */}
             <section className={styles.installSection}>
                 <h2>Installation Guides</h2>
 
                 <Accordion title="Install PyTrip on Windows">
-                    <p><strong>1. Download the Windows Installer (.exe)</strong></p>
-                    <p>Click "Download for Windows" above.</p>
-
-                    <p><strong>2. Double-click the installer</strong></p>
-                    <p>Windows SmartScreen may warn you. Click “More Info” → “Run anyway”.</p>
-
-                    <p><strong>3. Follow the installation wizard</strong></p>
-                    <p>The setup will install PyTrip automatically.</p>
+                    <p><strong>1. Download the Windows archive</strong></p>
+                    <p>Click “Download for Windows” above.</p>
+                    <p><strong>2. Extract the ZIP</strong></p>
+                    <p>Right-click → Extract all.</p>
+                    <p><strong>3. Run launcher.exe</strong></p>
                 </Accordion>
 
-                <Accordion title="Install PyTrip on macOS">
-                    <p><strong>1. Download the macOS .dmg file</strong></p>
-                    <p>Click “Download for macOS”.</p>
-
-                    <p><strong>2. Open the .dmg</strong></p>
-                    <p>Drag PyTrip into Applications.</p>
-                </Accordion>
-
-                <Accordion title="Install PyTrip on Linux (Debian / Ubuntu)">
+                <Accordion title="Install PyTrip on Linux">
                     <pre className={styles.code}>
-sudo dpkg -i pytrip_{latest?.version}_amd64.deb
-                    </pre>
-                </Accordion>
-
-                <Accordion title="Install PyTrip on Linux (Arch / Manjaro)">
-                    <pre className={styles.code}>
-tar -xvf pytrip.tar.gz
+tar -xvf pytrip-{latest?.version}-linux.tar.gz
                     </pre>
                 </Accordion>
             </section>
 
-            {/* VERSION HISTORY */}
+            {/* HISTORY */}
             {olderVersions.length > 0 && (
                 <section className={styles.history}>
                     <h2>Version History</h2>
+
                     <Accordion title="Show Older Versions">
                         <ul>
                             {olderVersions.map(v => (
                                 <li key={v.version}>
-                                    Version {v.version}
+                                    <strong>Version {v.version}</strong>
+
+                                    <div className={styles.historyButtons}>
+                                        {renderButton(
+                                            "Windows",
+                                            v.assets.windows
+                                        )}
+                                        {renderButton(
+                                            "Linux",
+                                            v.assets.linux
+                                        )}
+                                        {renderButton(
+                                            "macOS",
+                                            v.assets.macos ?? null
+                                        )}
+                                    </div>
                                 </li>
                             ))}
                         </ul>
