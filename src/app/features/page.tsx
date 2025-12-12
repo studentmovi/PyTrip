@@ -5,86 +5,96 @@ import Accordion from "@/components/Accordion/Accordion";
 import FeatureModal from "@/components/FeatureModal/FeatureModal";
 import FloatingSuggestButton from "@/components/FloatingSuggestButton/FloatingSuggestButton";
 import styles from "./features.module.scss";
-import Header from "@/components/Header/Header";
+
+type Release = {
+    version: string;
+    changes: string[];
+};
 
 export default function FeaturesPage() {
     const [openModal, setOpenModal] = useState(false);
-    const [version, setVersion] = useState<string | null>(null);
-    const [changelog, setChangelog] = useState<string | null>(null);
+    const [latest, setLatest] = useState<string | null>(null);
+    const [releases, setReleases] = useState<Release[]>([]);
 
     useEffect(() => {
         async function loadData() {
             try {
                 const res = await fetch("/api/app/version", { cache: "no-store" });
+
+                if (!res.ok) {
+                    throw new Error("API error");
+                }
+
                 const data = await res.json();
 
                 if (data.ok) {
-                    setVersion(data.version);
-                    setChangelog(data.changelog);
+                    setLatest(data.latest);
+                    setReleases(data.releases);
                 }
             } catch (err) {
-                console.error("Error loading app version/changelog", err);
+                console.error("Error loading app releases", err);
             }
         }
 
         loadData();
     }, []);
 
-    return (
-        <>
-            <main className={styles.features}>
-                {/* TITLE */}
-                <div className={styles.titleSection}>
-                    <h1>PyTrip Features & Release History</h1>
-                    <p>Explore what's new and see how PyTrip has evolved.</p>
-                </div>
+    const latestRelease = releases[0];
 
-                {/* LATEST UPDATE DYNAMIC */}
+    return (
+        <main className={styles.features}>
+            {/* TITLE */}
+            <div className={styles.titleSection}>
+                <h1>PyTrip Features & Release History</h1>
+                <p>Explore what's new and see how PyTrip has evolved.</p>
+            </div>
+
+            {/* LATEST UPDATE */}
+            {latestRelease && (
                 <section className={styles.latestUpdate}>
-                    <h2>Latest Update – Version {version ?? "..."}</h2>
+                    <h2>Latest Update – Version {latestRelease.version}</h2>
                     <p className={styles.releaseDate}>
-                        From GitHub • App Python Version File
+                        From GitHub • App Python Changelog
                     </p>
 
-                    {changelog && (
-                        <div className={styles.cards}>
-                            {changelog
-                                .split("\n")
-                                .filter(line => line.trim() !== "")
-                                .slice(0, 3)
-                                .map((line, index) => (
-                                    <div className={styles.card} key={index}>
-                                        <h3>• {line.substring(0, 40)}...</h3>
-                                        <p>{line}</p>
-                                    </div>
-                                ))}
-                        </div>
-                    )}
+                    <div className={styles.cards}>
+                        {latestRelease.changes.slice(0, 3).map((change, index) => (
+                            <div className={styles.card} key={index}>
+                                <h3>• {change.substring(0, 40)}...</h3>
+                                <p>{change}</p>
+                            </div>
+                        ))}
+                    </div>
                 </section>
+            )}
 
-                {/* RELEASE HISTORY */}
-                <section className={styles.history}>
-                    <h2>Release History</h2>
+            {/* RELEASE HISTORY */}
+            <section className={styles.history}>
+                <h2>Release History</h2>
 
-                    {changelog ? (
-                        <Accordion title={`Version ${version} — Latest`}>
+                {releases.length > 0 ? (
+                    releases.map((release) => (
+                        <Accordion
+                            key={release.version}
+                            title={`Version ${release.version}`}
+                        >
                             <ul>
-                                {changelog.split("\n").map((line, i) => (
+                                {release.changes.map((line, i) => (
                                     <li key={i}>{line}</li>
                                 ))}
                             </ul>
                         </Accordion>
-                    ) : (
-                        <p>Loading release notes...</p>
-                    )}
-                </section>
+                    ))
+                ) : (
+                    <p>Loading release notes...</p>
+                )}
+            </section>
 
-                {/* SUGGESTION BUTTON */}
-                <FloatingSuggestButton onClick={() => setOpenModal(true)} />
+            {/* SUGGESTION BUTTON */}
+            <FloatingSuggestButton onClick={() => setOpenModal(true)} />
 
-                {/* MODAL */}
-                <FeatureModal open={openModal} onClose={() => setOpenModal(false)} />
-            </main>
-        </>
+            {/* MODAL */}
+            <FeatureModal open={openModal} onClose={() => setOpenModal(false)} />
+        </main>
     );
 }
