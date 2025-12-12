@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Header, Footer } from "@/components";
+import UpdateManager from "@/components/UpdateManager/UpdateManager";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -26,6 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="fr" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider>
+            <UpdateManager />
+
             <Header />
 
             {/* Empêche le footer de remonter sur les petites pages */}

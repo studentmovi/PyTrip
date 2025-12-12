@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Accordion from "@/components/Accordion/Accordion";
 import FeatureModal from "@/components/FeatureModal/FeatureModal";
 import FloatingSuggestButton from "@/components/FloatingSuggestButton/FloatingSuggestButton";
@@ -9,69 +9,77 @@ import Header from "@/components/Header/Header";
 
 export default function FeaturesPage() {
     const [openModal, setOpenModal] = useState(false);
+    const [version, setVersion] = useState<string | null>(null);
+    const [changelog, setChangelog] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const res = await fetch("/api/app/version", { cache: "no-store" });
+                const data = await res.json();
+
+                if (data.ok) {
+                    setVersion(data.version);
+                    setChangelog(data.changelog);
+                }
+            } catch (err) {
+                console.error("Error loading app version/changelog", err);
+            }
+        }
+
+        loadData();
+    }, []);
 
     return (
         <>
             <main className={styles.features}>
+                {/* TITLE */}
                 <div className={styles.titleSection}>
                     <h1>PyTrip Features & Release History</h1>
                     <p>Explore what's new and see how PyTrip has evolved.</p>
                 </div>
 
-                {/* LATEST UPDATE */}
+                {/* LATEST UPDATE DYNAMIC */}
                 <section className={styles.latestUpdate}>
-                    <h2>Latest Update – Version 2.1.0</h2>
-                    <p className={styles.releaseDate}>Released on June 15, 2024</p>
+                    <h2>Latest Update – Version {version ?? "..."}</h2>
+                    <p className={styles.releaseDate}>
+                        From GitHub • App Python Version File
+                    </p>
 
-                    <div className={styles.cards}>
-                        <div className={styles.card}>
-                            <h3>Automated Itinerary Planning</h3>
-                            <p>Our AI generates faster, more accurate itineraries.</p>
+                    {changelog && (
+                        <div className={styles.cards}>
+                            {changelog
+                                .split("\n")
+                                .filter(line => line.trim() !== "")
+                                .slice(0, 3)
+                                .map((line, index) => (
+                                    <div className={styles.card} key={index}>
+                                        <h3>• {line.substring(0, 40)}...</h3>
+                                        <p>{line}</p>
+                                    </div>
+                                ))}
                         </div>
-
-                        <div className={styles.card}>
-                            <h3>Real-Time Collaboration</h3>
-                            <p>Coordinate trips instantly with staff.</p>
-                        </div>
-
-                        <div className={styles.card}>
-                            <h3>Offline Maps & Access</h3>
-                            <p>Improved caching and load times.</p>
-                        </div>
-                    </div>
+                    )}
                 </section>
 
-                {/* HISTORY */}
+                {/* RELEASE HISTORY */}
                 <section className={styles.history}>
                     <h2>Release History</h2>
 
-                    <Accordion title="Version 2.1.0 (Latest) — June 15, 2024">
-                        <ul>
-                            <li>🚀 Improved AI itinerary generator</li>
-                            <li>🤝 Real-time sync improvements</li>
-                            <li>📍 Offline map engine upgraded</li>
-                            <li>🐛 Minor bug fixes</li>
-                        </ul>
-                    </Accordion>
-
-                    <Accordion title="Version 2.0.5 — May 20, 2024">
-                        <ul>
-                            <li>📦 Faster loading times</li>
-                            <li>🖼 Updated UI components</li>
-                            <li>🔧 Fixed sync bug</li>
-                        </ul>
-                    </Accordion>
-
-                    <Accordion title="Version 2.0.0 — April 1, 2024">
-                        <ul>
-                            <li>✨ New dashboard</li>
-                            <li>🔄 Event planner redesign</li>
-                            <li>📊 Better analytics</li>
-                        </ul>
-                    </Accordion>
+                    {changelog ? (
+                        <Accordion title={`Version ${version} — Latest`}>
+                            <ul>
+                                {changelog.split("\n").map((line, i) => (
+                                    <li key={i}>{line}</li>
+                                ))}
+                            </ul>
+                        </Accordion>
+                    ) : (
+                        <p>Loading release notes...</p>
+                    )}
                 </section>
 
-                {/* FLOATING SUGGEST BUTTON */}
+                {/* SUGGESTION BUTTON */}
                 <FloatingSuggestButton onClick={() => setOpenModal(true)} />
 
                 {/* MODAL */}

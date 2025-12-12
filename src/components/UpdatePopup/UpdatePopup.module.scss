@@ -1,0 +1,74 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  width: 420px;
+  background: #1e1f22;
+  border-radius: 14px;
+  overflow: hidden;
+  animation: fadeIn 0.25s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+  .title {
+    background: #5865f2;
+    padding: 1rem 1.2rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  .version {
+    padding: 0.6rem 1.2rem 0;
+    color: #b5b8ff;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .changelog {
+    padding: 1.2rem;
+    margin: 0;
+    list-style: none;
+
+    li {
+      color: #dcdcdc;
+      margin-bottom: 0.4rem;
+      line-height: 1.4;
+    }
+  }
+
+  .close {
+    width: 100%;
+    padding: 1rem;
+    background: #3b3e45;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #4a4d55;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
