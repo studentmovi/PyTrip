@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout()
+    }
+
     environment {
         NODE_ENV = "production"
         DISCORD_WEBHOOK = credentials('discord-webhook')
@@ -19,30 +23,18 @@ pipeline {
         stage('Node version') {
             steps {
                 sh '''
-                    node -v
-                    npm -v
+                echo "🧠 Node & npm versions"
+                node -v
+                npm -v
                 '''
             }
         }
 
         stage('Install dependencies') {
             steps {
-                echo "📦 Installation des dépendances"
+                echo "📦 Installation des dépendances (prod only)"
                 sh '''
-                    npm ci
-                '''
-            }
-        }
-
-        stage('Lint (optionnel)') {
-            steps {
-                echo "🧹 Lint"
-                sh '''
-                    if npm run | grep -q lint; then
-                        npm run lint
-                    else
-                        echo "Pas de script lint"
-                    fi
+                npm ci
                 '''
             }
         }
@@ -51,28 +43,32 @@ pipeline {
             steps {
                 echo "🏗️ Build du site Next.js"
                 sh '''
-                    npm run build
+                npm run build
                 '''
             }
         }
     }
 
     post {
+
         success {
             sh '''
-            curl -H "Content-Type: application/json" \
+            TIMESTAMP=$(date -Iseconds)
+            curl -X POST -H "Content-Type: application/json" \
             -d "{
-              \\"username\\": \\"Jenkins\\",
+              \\"username\\": \\"Jenkins CI\\",
+              \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
               \\"embeds\\": [{
-                \\"title\\": \\"✅ Build SUCCESS – PyTrip\\",
-                \\"color\\": 3066993,
+                \\"title\\": \\"✅ Build réussi\\",
+                \\"description\\": \\"Le build **PyTrip** s’est terminé avec succès.\\",
+                \\"color\\": 5763719,
                 \\"fields\\": [
-                  { \\"name\\": \\"Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
-                  { \\"name\\": \\"Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"Status\\", \\"value\\": \\"SUCCESS  🚀\\", \\"inline\\": false }
+                  { \\"name\\": \\"📦 Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
+                  { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                  { \\"name\\": \\"🚀 Status\\", \\"value\\": \\"SUCCESS\\", \\"inline\\": false }
                 ],
-                \\"footer\\": { \\"text\\": \\"Jenkins CI\\" },
-                \\"timestamp\\": \\"$(date -Iseconds)\\"
+                \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
+                \\"timestamp\\": \\"$TIMESTAMP\\"
               }]
             }" "$DISCORD_WEBHOOK"
             '''
@@ -80,19 +76,22 @@ pipeline {
 
         failure {
             sh '''
-            curl -H "Content-Type: application/json" \
+            TIMESTAMP=$(date -Iseconds)
+            curl -X POST -H "Content-Type: application/json" \
             -d "{
-              \\"username\\": \\"Jenkins\\",
+              \\"username\\": \\"Jenkins CI\\",
+              \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
               \\"embeds\\": [{
-                \\"title\\": \\"❌ Build FAILED – PyTrip\\",
-                \\"color\\": 15158332,
+                \\"title\\": \\"❌ Build échoué\\",
+                \\"description\\": \\"Le build **PyTrip** a échoué. Va jeter un œil aux logs Jenkins 👀\\",
+                \\"color\\": 15548997,
                 \\"fields\\": [
-                  { \\"name\\": \\"Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
-                  { \\"name\\": \\"Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"Status\\", \\"value\\": \\"FAILURE 🚨\\", \\"inline\\": false }
+                  { \\"name\\": \\"📦 Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
+                  { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                  { \\"name\\": \\"💥 Status\\", \\"value\\": \\"FAILURE\\", \\"inline\\": false }
                 ],
-                \\"footer\\": { \\"text\\": \\"Jenkins CI\\" },
-                \\"timestamp\\": \\"$(date -Iseconds)\\"
+                \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
+                \\"timestamp\\": \\"$TIMESTAMP\\"
               }]
             }" "$DISCORD_WEBHOOK"
             '''
