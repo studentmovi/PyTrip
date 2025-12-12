@@ -69,7 +69,7 @@ pipeline {
                 \\"fields\\": [
                   { \\"name\\": \\"Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
                   { \\"name\\": \\"Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"Status\\", \\"value\\": \\"SUCCESS 🚀\\", \\"inline\\": false }
+                  { \\"name\\": \\"Status\\", \\"value\\": \\"SUCCESS  🚀\\", \\"inline\\": false }
                 ],
                 \\"footer\\": { \\"text\\": \\"Jenkins CI\\" },
                 \\"timestamp\\": \\"$(date -Iseconds)\\"
