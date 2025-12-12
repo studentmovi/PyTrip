@@ -1,0 +1,15 @@
+{
+  "version": "1.2.0",
+  "changelog": [
+    "✨ Added a Discord-style site update popup (patch notes modal)",
+    "🔄 Implemented automatic site version checking using localStorage",
+    "📦 Introduced a centralized version.json for site versioning",
+    "🧠 Added UpdateManager and useUpdateChecker for update detection",
+    "🧩 Integrated site update popup into the global layout",
+    "📄 Reworked the Features page to dynamically load app releases from GitHub",
+    "📥 Reworked the Download page to dynamically display the latest app version and changelog",
+    "🔗 Added a Next.js API route to fetch app version and changelog directly from the GitHub repository",
+    "🎨 Improved UI consistency and layout stability across Features and Download pages",
+    "🚀 Improved overall site performance and data loading reliability"
+  ]
+}
