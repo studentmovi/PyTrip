@@ -6,6 +6,7 @@ pipeline {
     }
 
     environment {
+        CI = 'true'
         NODE_ENV = "production"
         DISCORD_WEBHOOK = credentials('discord-webhook')
     }
