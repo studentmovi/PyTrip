@@ -33,12 +33,11 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                echo "📦 Installation des dépendances (prod only)"
-                sh '''
-                npm ci
-                '''
+                echo "📦 Installation des dépendances (avec dev)"
+                sh 'npm ci --include=dev'
             }
         }
+
 
         stage('Build Next.js') {
             steps {
