@@ -3,12 +3,12 @@ import { NextResponse } from "next/server";
 async function fetchJson(path: string) {
     const url = `https://raw.githubusercontent.com/studentmovi/ProjetDevOps/main/app/${path}`;
     const res = await fetch(url, { cache: "no-store" });
-
     if (!res.ok) {
         throw new Error(`Failed to fetch ${path}`);
     }
-
-    return res.json();
+    const text = await res.text();
+    const cleanText = text.replace(/^\uFEFF/, "");
+    return JSON.parse(cleanText);
 }
 
 export async function GET() {

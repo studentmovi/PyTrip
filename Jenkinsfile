@@ -1,13 +1,15 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout()
+    tools {
+        nodejs "node"
     }
 
     environment {
         CI = 'true'
-        NODE_ENV = "production"
+        NODE_ENV = 'production'
+        PORT = '3016'
+        NEXT_DISABLE_TURBOPACK = '1'
         DISCORD_WEBHOOK = credentials('discord-webhook')
     }
 
@@ -15,61 +17,81 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo "📥 Clonage du repo PyTrip (Next.js)"
+                echo "📥 Clonage du repo PyTrip"
                 git branch: 'main',
                     url: 'https://github.com/studentmovi/PyTrip.git'
             }
         }
 
-        stage('Node version') {
+        stage('Install dependencies (dev)') {
             steps {
+                echo "📦 Installation des dépendances (dev inclus)"
+                sh 'npm ci'
+            }
+        }
+
+        stage('Build Next.js') {
+            steps {
+                echo "🏗️ Build du site PyTrip"
                 sh '''
-                echo "🧠 Node & npm versions"
-                node -v
-                npm -v
+                    export PORT=$PORT
+                    npm run build
                 '''
             }
         }
 
-        stage('Install dependencies') {
+        stage('Archive build output') {
             steps {
-                echo "📦 Installation des dépendances (avec dev)"
-                sh 'npm ci --include=dev'
+                archiveArtifacts artifacts: '.next/**', fingerprint: true
             }
         }
 
-
-        stage('Build Next.js') {
+        stage('Install dependencies (prod only)') {
             steps {
-                echo "🏗️ Build du site Next.js"
+                echo "📦 Installation des dépendances PROD only"
                 sh '''
-                npm run build
+                    rm -rf node_modules
+                    npm ci --omit=dev
+                '''
+            }
+        }
+
+        stage('Deploy & Run with PM2') {
+            steps {
+                echo "🚀 Lancement de PyTrip via PM2"
+                sh '''
+                    cd "$WORKSPACE"
+
+                    export PORT=$PORT
+                    export NODE_ENV=production
+
+                    pm2 delete pytrip || true
+                    pm2 start npm --name "pytrip" -- run start
+                    pm2 save
                 '''
             }
         }
     }
 
     post {
-
         success {
             sh '''
             TIMESTAMP=$(date -Iseconds)
             curl -X POST -H "Content-Type: application/json" \
             -d "{
-              \\"username\\": \\"Jenkins CI\\",
+              \\"username\\": \\"PyTrip Deploy\\",
               \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
               \\"embeds\\": [{
-                \\"title\\": \\"✅ Build réussi\\",
-                \\"description\\": \\"Le build **PyTrip** s’est terminé avec succès.\\",
+                \\"title\\": \\"✅ Déploiement réussi\\",
+                \\"description\\": \\"**PyTrip** est en ligne 🚀\\",
                 \\"color\\": 5763719,
                 \\"fields\\": [
-                  { \\"name\\": \\"📦 Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
+                  { \\"name\\": \\"🌐 Port\\", \\"value\\": \\"$PORT\\", \\"inline\\": true },
                   { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"🚀 Status\\", \\"value\\": \\"SUCCESS\\", \\"inline\\": false }
+                  { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir le build]($BUILD_URL)\\", \\"inline\\": false }
                 ],
                 \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
-                \\"timestamp\\": \\"$TIMESTAMP\\"
-              }]
+                \\"timestamp\\": \\"$TIMESTAMP\\"}]
             }" "$DISCORD_WEBHOOK"
             '''
         }
@@ -79,20 +101,18 @@ pipeline {
             TIMESTAMP=$(date -Iseconds)
             curl -X POST -H "Content-Type: application/json" \
             -d "{
-              \\"username\\": \\"Jenkins CI\\",
+              \\"username\\": \\"PyTrip Deploy\\",
               \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
               \\"embeds\\": [{
-                \\"title\\": \\"❌ Build échoué\\",
-                \\"description\\": \\"Le build **PyTrip** a échoué. Va jeter un œil aux logs Jenkins 👀\\",
+                \\"title\\": \\"❌ Déploiement échoué\\",
+                \\"description\\": \\"Le déploiement de **PyTrip** a échoué 😬\\",
                 \\"color\\": 15548997,
                 \\"fields\\": [
-                  { \\"name\\": \\"📦 Repository\\", \\"value\\": \\"studentmovi/PyTrip\\", \\"inline\\": true },
                   { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"💥 Status\\", \\"value\\": \\"FAILURE\\", \\"inline\\": false }
+                  { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir les logs]($BUILD_URL)\\", \\"inline\\": false }
                 ],
                 \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
-                \\"timestamp\\": \\"$TIMESTAMP\\"
-              }]
+                \\"timestamp\\": \\"$TIMESTAMP\\"}]
             }" "$DISCORD_WEBHOOK"
             '''
         }
