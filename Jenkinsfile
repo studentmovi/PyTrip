@@ -10,7 +10,7 @@ pipeline {
         NODE_ENV = 'production'
         PORT = '3016'
         NEXT_DISABLE_TURBOPACK = '1'
-        DISCORD_WEBHOOK = credentials('discord-webhook')
+        DISCORD_WEBHOOK = credentials('pytripwebhook')
     }
 
     stages {

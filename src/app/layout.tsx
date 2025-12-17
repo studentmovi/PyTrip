@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Header, Footer } from "@/components";
 import UpdateManager from "@/components/UpdateManager/UpdateManager";
+import AppUpdateManager from "@/components/AppUpdateManager/AppUpdateManager";
 
 const geistSans = localFont({
     src: [
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider>
             <UpdateManager />
+            <AppUpdateManager />
 
             <Header />
 
