@@ -7,7 +7,6 @@ pipeline {
 
     environment {
         CI = 'true'
-        NODE_ENV = 'production'
         PORT = '3016'
         NEXT_DISABLE_TURBOPACK = '1'
         DISCORD_WEBHOOK = credentials('pytripwebhook')
@@ -17,16 +16,20 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo "📥 Clonage du repo PyTrip"
-                git branch: 'main',
-                    url: 'https://github.com/studentmovi/PyTrip.git'
+                echo "📥 Checkout SCM"
+                checkout scm
             }
         }
 
         stage('Install dependencies (dev)') {
             steps {
                 echo "📦 Installation des dépendances (dev inclus)"
-                sh 'npm ci'
+                sh '''
+                    # IMPORTANT: ne pas être en mode prod ici, sinon devDependencies sautent
+                    unset NODE_ENV
+                    export NPM_CONFIG_PRODUCTION=false
+                    npm ci --include=dev
+                '''
             }
         }
 
@@ -34,6 +37,7 @@ pipeline {
             steps {
                 echo "🏗️ Build du site PyTrip"
                 sh '''
+                    unset NODE_ENV
                     export PORT=$PORT
                     npm run build
                 '''
@@ -51,6 +55,7 @@ pipeline {
                 echo "📦 Installation des dépendances PROD only"
                 sh '''
                     rm -rf node_modules
+                    export NODE_ENV=production
                     npm ci --omit=dev
                 '''
             }
@@ -75,46 +80,50 @@ pipeline {
 
     post {
         success {
-            sh '''
-            TIMESTAMP=$(date -Iseconds)
-            curl -X POST -H "Content-Type: application/json" \
-            -d "{
-              \\"username\\": \\"PyTrip Deploy\\",
-              \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
-              \\"embeds\\": [{
-                \\"title\\": \\"✅ Déploiement réussi\\",
-                \\"description\\": \\"**PyTrip** est en ligne 🚀\\",
-                \\"color\\": 5763719,
-                \\"fields\\": [
-                  { \\"name\\": \\"🌐 Port\\", \\"value\\": \\"$PORT\\", \\"inline\\": true },
-                  { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir le build]($BUILD_URL)\\", \\"inline\\": false }
-                ],
-                \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
-                \\"timestamp\\": \\"$TIMESTAMP\\"}]
-            }" "$DISCORD_WEBHOOK"
-            '''
+            node {
+                sh '''
+                TIMESTAMP=$(date -Iseconds)
+                curl -X POST -H "Content-Type: application/json" \
+                -d "{
+                  \\"username\\": \\"PyTrip Deploy\\",
+                  \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
+                  \\"embeds\\": [{
+                    \\"title\\": \\"✅ Déploiement réussi\\",
+                    \\"description\\": \\"**PyTrip** est en ligne 🚀\\",
+                    \\"color\\": 5763719,
+                    \\"fields\\": [
+                      { \\"name\\": \\"🌐 Port\\", \\"value\\": \\"$PORT\\", \\"inline\\": true },
+                      { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                      { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir le build]($BUILD_URL)\\", \\"inline\\": false }
+                    ],
+                    \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
+                    \\"timestamp\\": \\"$TIMESTAMP\\"}]
+                }" "$DISCORD_WEBHOOK"
+                '''
+            }
         }
 
         failure {
-            sh '''
-            TIMESTAMP=$(date -Iseconds)
-            curl -X POST -H "Content-Type: application/json" \
-            -d "{
-              \\"username\\": \\"PyTrip Deploy\\",
-              \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
-              \\"embeds\\": [{
-                \\"title\\": \\"❌ Déploiement échoué\\",
-                \\"description\\": \\"Le déploiement de **PyTrip** a échoué 😬\\",
-                \\"color\\": 15548997,
-                \\"fields\\": [
-                  { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
-                  { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir les logs]($BUILD_URL)\\", \\"inline\\": false }
-                ],
-                \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
-                \\"timestamp\\": \\"$TIMESTAMP\\"}]
-            }" "$DISCORD_WEBHOOK"
-            '''
+            node {
+                sh '''
+                TIMESTAMP=$(date -Iseconds)
+                curl -X POST -H "Content-Type: application/json" \
+                -d "{
+                  \\"username\\": \\"PyTrip Deploy\\",
+                  \\"avatar_url\\": \\"https://www.jenkins.io/images/logos/jenkins/jenkins.png\\",
+                  \\"embeds\\": [{
+                    \\"title\\": \\"❌ Déploiement échoué\\",
+                    \\"description\\": \\"Le déploiement de **PyTrip** a échoué 😬\\",
+                    \\"color\\": 15548997,
+                    \\"fields\\": [
+                      { \\"name\\": \\"🌿 Branch\\", \\"value\\": \\"main\\", \\"inline\\": true },
+                      { \\"name\\": \\"🔗 Jenkins\\", \\"value\\": \\"[Voir les logs]($BUILD_URL)\\", \\"inline\\": false }
+                    ],
+                    \\"footer\\": { \\"text\\": \\"Jenkins • PyTrip CI\\" },
+                    \\"timestamp\\": \\"$TIMESTAMP\\"}]
+                }" "$DISCORD_WEBHOOK"
+                '''
+            }
         }
     }
 }
