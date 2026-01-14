@@ -6,27 +6,27 @@ export default function Features() {
         <section className={styles.features}>
             <div className={styles.badge}>Features</div>
             <h2>
-                Powerful Tools for Seamless Trip <br /> Management
+                Powerful tools for smooth management of school trips and outings  <br />
             </h2>
             <p className={styles.desc}>
-                Dive deeper into the functionalities that make PyTrip a complete
-                solution for organizing group travel.
+                Find out more about the features that make PyTrip a comprehensive solution
+                for organising and managing the calculation of student fees.
             </p>
 
             <div className={styles.grid}>
                 <div className={styles.card}>
-                    <h4>Simplified Event Management</h4>
-                    <p>Centralized management of activities & participants.</p>
+                    <h4>Simplified event management</h4>
+                    <p>Centralised management of activities and participants.</p>
                 </div>
 
                 <div className={styles.card}>
-                    <h4>Automatic Price Calculation</h4>
-                    <p>Calculate everything in one click.</p>
+                    <h4>Automatic price calculation</h4>
+                    <p>Calculate everything with a single click.</p>
                 </div>
 
                 <div className={styles.card}>
-                    <h4>Real-Time Travel Tracking</h4>
-                    <p>Track progress and location instantly.</p>
+                    <h4>Event tracking on the calendar</h4>
+                    <p>Instantly track events scheduled for the same day or month</p>
                 </div>
             </div>
         </section>
