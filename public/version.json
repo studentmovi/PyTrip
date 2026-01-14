@@ -3,7 +3,8 @@
   "changelog": [
     "©️ Updated footer copyright information",
     "🌗 Fixed UI inconsistencies between dark and light themes",
-    "🎨 Improved color handling and contrast across components for better theme switching"
+    "🎨 Improved color handling and contrast across components for better theme switching",
+    "+ Add new Pictures section ShowCase"
   ]
 }
 
