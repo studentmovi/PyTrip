@@ -72,9 +72,10 @@ pipeline {
           # IMPORTANT: forcer l'utilisation de Node du tool Jenkins (sinon EACCES)
           export PATH="$NODEJS_HOME/bin:$PATH"
 
-          pm2 delete pytrip || true
+          # IMPORTANT: empêcher Jenkins de tuer le process en fin de job
+          export JENKINS_NODE_COOKIE=dontKillMe
 
-          # IMPORTANT: forcer Next à écouter en LOCAL (sinon Nginx 502)
+          pm2 delete pytrip || true
           pm2 start npm --name "pytrip" -- run start -- -H 127.0.0.1 -p 3016
 
           pm2 save
