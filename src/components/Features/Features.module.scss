@@ -1,17 +1,19 @@
 .features {
   padding: 100px 20px;
   text-align: center;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .badge {
-  color: #2563eb;
+  color: var(--primary);
   font-weight: 700;
   margin-bottom: 10px;
 }
 
 .desc {
   margin-top: 8px;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .grid {
@@ -24,8 +26,14 @@
 }
 
 .card {
-  background: white;
+  background: var(--card);
+  border: 1px solid var(--border);
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow, 0 5px 20px rgba(0, 0, 0, 0.06));
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 }

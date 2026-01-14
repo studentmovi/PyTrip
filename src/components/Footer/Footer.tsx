@@ -27,7 +27,7 @@ export default function Footer() {
         <footer className={styles.footer}>
             <div className={styles.container}>
                 <p>
-                    © 2024 PyTrip. All Rights Reserved.
+                    © 2026 PyTrip. All Rights Reserved.
                     {siteVersion && (
                         <> • <span style={{ opacity: 0.8 }}>version : {siteVersion}</span></>
                     )}
