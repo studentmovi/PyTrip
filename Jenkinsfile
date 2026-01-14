@@ -66,15 +66,23 @@ pipeline {
         echo "🚀 Lancement de PyTrip via PM2"
         sh '''
           cd "$WORKSPACE"
-          export PORT=$PORT
           export NODE_ENV=production
+          export PORT=3016
+
+          # IMPORTANT: forcer l'utilisation de Node du tool Jenkins (sinon EACCES)
+          export PATH="$NODEJS_HOME/bin:$PATH"
 
           pm2 delete pytrip || true
-          pm2 start npm --name "pytrip" -- run start
+
+          # IMPORTANT: forcer Next à écouter en LOCAL (sinon Nginx 502)
+          pm2 start npm --name "pytrip" -- run start -- -H 127.0.0.1 -p 3016
+
           pm2 save
+          pm2 list
         '''
       }
     }
+
   }
 
   post {
