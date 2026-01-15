@@ -1,8 +1,9 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "changelog": [
-    "📊 Added website tracking via Google Tag Manager (GTM)",
-    "⬇️ Fixed version download/release fetching issues on the Download page"
+    "🍪 Added GDPR-compliant cookie consent banner with accept/refuse options",
+    "🔒 Implemented Google Consent Mode (analytics disabled by default)",
+    "🎯 Added download button tracking (OS, version, latest/legacy) via GA4",
+    "📈 Improved analytics accuracy by tracking downloads only after user consent"
   ]
 }
-
