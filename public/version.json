@@ -1,10 +1,8 @@
 {
-  "version": "1.2.1",
+  "version": "1.2.2",
   "changelog": [
-    "©️ Updated footer copyright information",
-    "🌗 Fixed UI inconsistencies between dark and light themes",
-    "🎨 Improved color handling and contrast across components for better theme switching",
-    "+ Add new Pictures section ShowCase"
+    "📊 Added website tracking via Google Tag Manager (GTM)",
+    "⬇️ Fixed version download/release fetching issues on the Download page"
   ]
 }
 
