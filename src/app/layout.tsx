@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { Header, Footer } from "@/components";
 import UpdateManager from "@/components/UpdateManager/UpdateManager";
 import AppUpdateManager from "@/components/AppUpdateManager/AppUpdateManager";
+import CokieConsent from "@/components/CookieConsent/CookieConsent";
 
 const geistSans = localFont({
     src: [
@@ -36,6 +37,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="fr" suppressHydrationWarning>
         <head>
+            <Script id="consent-default" strategy="beforeInteractive">
+                {`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                
+                    // Default: deny everything (EEA-friendly)
+                    gtag('consent', 'default', {
+                      ad_storage: 'denied',
+                      ad_user_data: 'denied',
+                      ad_personalization: 'denied',
+                      analytics_storage: 'denied',
+                      functionality_storage: 'granted',
+                      security_storage: 'granted'
+                    });
+                  `}
+            </Script>
+
             {/* Google Tag Manager */}
             <Script id="gtm" strategy="afterInteractive">
                 {`
@@ -68,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {children}
             </main>
 
+            <CokieConsent/>
             <Footer/>
         </ThemeProvider>
         </body>

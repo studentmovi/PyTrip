@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Accordion from "@/components/Accordion/Accordion";
 import styles from "./download.module.scss";
+import { track } from "@/hooks/analytics";
 
 type Release = {
     version: string;
@@ -51,14 +52,26 @@ export default function DownloadPage() {
     const renderButton = (
         label: string,
         url: string | null,
-        primary = false
+        primary = false,
+        meta?: { os?: string; version?: string; isLatest?: boolean }
     ) => {
         if (url) {
             return (
                 <a
                     href={url}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className={primary ? styles.btnPrimary : styles.btn}
+                    onClick={() => {
+                        track("download_click", {
+                            page: "download",
+                            label,
+                            url,
+                            os: meta?.os ?? "unknown",
+                            version: meta?.version ?? "unknown",
+                            is_latest: meta?.isLatest ?? false,
+                        });
+                    }}
                 >
                     {label}
                 </a>
@@ -67,9 +80,9 @@ export default function DownloadPage() {
 
         return (
             <span className={styles.btnDisabled}>
-                {label}
+        {label}
                 <small>Coming soon</small>
-            </span>
+      </span>
         );
     };
 
@@ -86,19 +99,23 @@ export default function DownloadPage() {
                     </h2>
 
                     <div className={styles.buttons}>
-                        {renderButton(
-                            "Download for Windows",
-                            latest.assets.windows,
-                            true
-                        )}
-                        {renderButton(
-                            "Download for Linux",
-                            latest.assets.linux
-                        )}
-                        {renderButton(
-                            "Download for macOS",
-                            latest.assets.macos ?? null
-                        )}
+                        {renderButton("Download for Windows", latest.assets.windows, true, {
+                            os: "windows",
+                            version: latest.version,
+                            isLatest: true,
+                        })}
+
+                        {renderButton("Download for Linux", latest.assets.linux, false, {
+                            os: "linux",
+                            version: latest.version,
+                            isLatest: true,
+                        })}
+
+                        {renderButton("Download for macOS", latest.assets.macos ?? null, false, {
+                            os: "macos",
+                            version: latest.version,
+                            isLatest: true,
+                        })}
                     </div>
 
                     <Accordion title="What's new in this version?">
@@ -116,17 +133,23 @@ export default function DownloadPage() {
                 <h2>Installation Guides</h2>
 
                 <Accordion title="Install PyTrip on Windows">
-                    <p><strong>1. Download the Windows archive</strong></p>
+                    <p>
+                        <strong>1. Download the Windows archive</strong>
+                    </p>
                     <p>Click “Download for Windows” above.</p>
-                    <p><strong>2. Extract the ZIP</strong></p>
+                    <p>
+                        <strong>2. Extract the ZIP</strong>
+                    </p>
                     <p>Right-click → Extract all.</p>
-                    <p><strong>3. Run launcher.exe</strong></p>
+                    <p>
+                        <strong>3. Run launcher.exe</strong>
+                    </p>
                 </Accordion>
 
                 <Accordion title="Install PyTrip on Linux">
-                    <pre className={styles.code}>
-tar -xvf pytrip-{latest?.version}-linux.tar.gz
-                    </pre>
+          <pre className={styles.code}>
+{`tar -xvf pytrip-${latest?.version}-linux.tar.gz`}
+          </pre>
                 </Accordion>
             </section>
 
@@ -137,23 +160,28 @@ tar -xvf pytrip-{latest?.version}-linux.tar.gz
 
                     <Accordion title="Show Older Versions">
                         <ul>
-                            {olderVersions.map(v => (
+                            {olderVersions.map((v) => (
                                 <li key={v.version}>
                                     <strong>Version {v.version}</strong>
 
                                     <div className={styles.historyButtons}>
-                                        {renderButton(
-                                            "Windows",
-                                            v.assets.windows
-                                        )}
-                                        {renderButton(
-                                            "Linux",
-                                            v.assets.linux
-                                        )}
-                                        {renderButton(
-                                            "macOS",
-                                            v.assets.macos ?? null
-                                        )}
+                                        {renderButton("Windows", v.assets.windows, false, {
+                                            os: "windows",
+                                            version: v.version,
+                                            isLatest: false,
+                                        })}
+
+                                        {renderButton("Linux", v.assets.linux, false, {
+                                            os: "linux",
+                                            version: v.version,
+                                            isLatest: false,
+                                        })}
+
+                                        {renderButton("macOS", v.assets.macos ?? null, false, {
+                                            os: "macos",
+                                            version: v.version,
+                                            isLatest: false,
+                                        })}
                                     </div>
                                 </li>
                             ))}
